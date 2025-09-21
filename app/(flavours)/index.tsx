@@ -1,6 +1,6 @@
-import { Button, ContextMenu, HStack, Host, Image, List, Spacer, Text } from '@expo/ui/swift-ui';
+import { Button, ContextMenu, HStack, Host, Image, Spacer, Text } from '@expo/ui/swift-ui';
 import { Link, Stack } from 'expo-router';
-import { useColorScheme } from 'react-native';
+import { FlatList, useColorScheme } from 'react-native';
 
 import { FlavourList } from '@/model';
 import { frame } from '@expo/ui/swift-ui/modifiers';
@@ -45,21 +45,41 @@ export default function Index() {
         }}
       />
       <Host style={{ flex: 1 }} colorScheme={colorScheme}>
-        <List>
-          {FlavourList.map((item, index) => (
-            <Link href={`/flavours/${item.id}`} asChild key={index}>
-              <Button>
-                <HStack spacing={8}>
-                  <Text size={14} color="secondary">{`#${index + 1}:`}</Text>
-                  <Text size={14} color="primary">{`${item.name}`}</Text>
-                  <Spacer />
-                  <Image systemName="chevron.right" size={14} color="secondary" />
-                </HStack>
-              </Button>
+        <FlatList
+          data={FlavourList}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item, index }) => (
+            <Link href={`/flavours/${item.id}`} asChild>
+              <Link.Trigger>
+                <FlavourItem item={item} index={index} />
+              </Link.Trigger>
+              <Link.Preview>
+                <FlavourItem item={item} index={index} />
+              </Link.Preview>
+              <Link.Menu>
+                <Link.MenuAction icon="eye" title="View" onPress={() => {}} />
+                <Link.MenuAction icon="pencil" title="Edit" onPress={() => {}} />
+                <Link.MenuAction icon="trash" destructive title="Delete" onPress={() => {}} />
+              </Link.Menu>
             </Link>
-          ))}
-        </List>
+          )}
+        />
       </Host>
     </>
+  );
+}
+
+function FlavourItem({ item, index }: { item: any; index: number }) {
+  return (
+    <Host matchContents modifiers={[frame({ width: 100, height: 64 })]}>
+      <Button>
+        <HStack spacing={8}>
+          <Text size={14} color="secondary">{`#${index + 1}:`}</Text>
+          <Text size={14} color="primary">{`${item.name}`}</Text>
+          <Spacer />
+          <Image systemName="chevron.right" size={14} color="secondary" />
+        </HStack>
+      </Button>
+    </Host>
   );
 }
